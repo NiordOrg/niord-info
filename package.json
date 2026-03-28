@@ -1,0 +1,71 @@
+{
+  "name": "@niord-org/niord-info",
+  "version": "0.1.0",
+  "description": "Reusable Angular library for Notices to Mariners (NM)",
+  "license": "Apache-2.0",
+  "author": "Danish Maritime Authority <info@dma.dk>",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/NiordOrg/niord-info.git"
+  },
+  "keywords": [
+    "angular",
+    "maritime",
+    "notices-to-mariners",
+    "niord",
+    "nautical",
+    "navigational warnings"
+  ],
+  "sideEffects": false,
+  "scripts": {
+    "build": "ng-packagr -p ng-package.json",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "peerDependencies": {
+    "@angular/common": "^21.2.5",
+    "@angular/compiler": "^21.2.5",
+    "@angular/core": "^21.2.5",
+    "@angular/forms": "^21.2.5",
+    "@angular/platform-browser": "^21.2.5",
+    "@angular/router": "^21.2.5",
+    "@jsverse/transloco": "^7.0.0",
+    "@ng-bootstrap/ng-bootstrap": "^20.0.0",
+    "bootstrap": "^5.3.8",
+    "bootstrap-icons": "^1.13.1",
+    "date-fns": "^4.1.0",
+    "date-fns-tz": "^3.2.0",
+    "dayjs": "^1.11.20",
+    "ngx-daterangepicker-bootstrap": "^21.5.0",
+    "ol": "^10.8.0",
+    "rxjs": "~7.8.0"
+  },
+  "devDependencies": {
+    "@analogjs/vitest-angular": "^2.3.1",
+    "@angular/build": "21.2.3",
+    "@angular/cli": "21.2.3",
+    "@angular/common": "21.2.5",
+    "@angular/compiler": "21.2.5",
+    "@angular/compiler-cli": "21.2.5",
+    "@angular/core": "21.2.5",
+    "@angular/forms": "21.2.5",
+    "@angular/platform-browser": "21.2.5",
+    "@angular/router": "21.2.5",
+    "@jsverse/transloco": "^7.0.0",
+    "@ng-bootstrap/ng-bootstrap": "^20.0.0",
+    "bootstrap": "^5.3.8",
+    "bootstrap-icons": "^1.13.1",
+    "date-fns": "^4.1.0",
+    "date-fns-tz": "^3.2.0",
+    "dayjs": "^1.11.20",
+    "jsdom": "^29.0.1",
+    "ng-packagr": "^21.1.2",
+    "ngx-daterangepicker-bootstrap": "^21.5.0",
+    "ol": "^10.8.0",
+    "rxjs": "~7.8.0",
+    "tslib": "^2.3.0",
+    "typescript": "~5.9.2",
+    "vitest": "^4.1.1",
+    "zone.js": "^0.16.1"
+  }
+}
