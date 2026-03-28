@@ -36,24 +36,16 @@ npm run dev
 
 That lets `niord-info-dk` use this library source directly without publishing every change.
 
-## GitHub Actions release flow
+## Releasing
 
-- CI workflow: `.github/workflows/ci.yml`
-- Release workflow: `.github/workflows/release.yml`
+Publishing to npm uses OIDC trusted publishing — no tokens or secrets needed.
 
-Required GitHub secret:
-
-- `NPM_TOKEN` (npm publish token)
-
-Release steps:
-
-```bash
-# in the standalone niord-info repo
-npm version patch
-git push
-git tag v$(node -p "require('./package.json').version")
-git push --tags
-```
-
-The tag-triggered workflow validates the `v*` tag against `package.json`, builds the library,
-creates a GitHub Release with the packed `.tgz` artifact, and publishes to npm.
+1. Update the version in `package.json` and commit:
+   ```bash
+   npm version patch  # or minor, major
+   git push
+   ```
+2. Create a GitHub Release at https://github.com/NiordOrg/niord-info/releases/new
+   - Tag: `v<version>` (e.g. `v0.2.0`) — the `v` prefix is required
+   - The tag version must match the version in `package.json`
+3. Publishing the release triggers the workflow, which builds the library and publishes to npm.
