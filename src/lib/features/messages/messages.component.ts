@@ -58,6 +58,7 @@ export class MessagesComponent implements OnInit {
   });
   readonly activeNow = signal(false);
   readonly areaMessages = signal<MessageVo[]>([]);
+  readonly areaHeadings = signal(new Map<string, AreaVo>());
   readonly subAreas = signal<AreaVo[]>([]);
   readonly loading = signal(true);
 
@@ -159,8 +160,8 @@ export class MessagesComponent implements OnInit {
     params += `&areaId=${rootArea.id}`;
 
     this.messagesSub?.unsubscribe();
-    this.messagesSub = this.http
-      .get<MessageVo[]>(`/api/rest/public/v1/messages?${params}`)
+    this.messagesSub = this.messageService
+      .getMessages(params)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (messages) => {
@@ -168,14 +169,17 @@ export class MessagesComponent implements OnInit {
           this.checkGroupByArea(sorted);
           this.areaMessages.set(sorted);
         },
+        error: () => {
+          this.areaMessages.set([]);
+          this.loading.set(false);
+        },
       });
   }
 
   private checkGroupByArea(messages: MessageVo[]): void {
-    this.messageService.addAreaHeadings(messages);
-    const newSubAreas = messages
-      .filter((msg) => msg.areaHeading?.parent)
-      .map((msg) => msg.areaHeading!);
+    const headings = this.messageService.computeAreaHeadings(messages);
+    this.areaHeadings.set(headings);
+    const newSubAreas = [...headings.values()].filter((area) => area.parent);
     this.subAreas.set(newSubAreas);
   }
 }

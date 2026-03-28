@@ -1,5 +1,4 @@
 import { Component, ChangeDetectionStrategy, DestroyRef, inject, signal, OnInit } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute } from '@angular/router';
 import { TranslocoService } from '@jsverse/transloco';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -11,7 +10,7 @@ import { LanguageService } from '../../../../core/services/language.service';
 import { LocaleService } from '../../../../core/services/locale.service';
 import { MessageService } from '../../../../core/services/message.service';
 import { AppConfigService } from '../../../../core/services/app-config.service';
-import { MessageVo } from '../../../../core/models/message.model';
+import { MessageVo, AreaVo } from '../../../../core/models/message.model';
 
 @Component({
   selector: 'app-message-print-view',
@@ -82,13 +81,10 @@ import { MessageVo } from '../../../../core/models/message.model';
     @media print {
       .print-body { background: white; }
       .message-search-text {
-        background-color: #002D47 !important;
-        color: white !important;
         -webkit-print-color-adjust: exact;
         print-color-adjust: exact;
       }
       .message-details-item {
-        background-color: white !important;
         -webkit-print-color-adjust: exact;
         print-color-adjust: exact;
         page-break-inside: avoid;
@@ -102,13 +98,22 @@ import { MessageVo } from '../../../../core/models/message.model';
       <div class="message-details-list">
         <div class="message-search-text">{{ bannerText() }}</div>
 
+        @if (error(); as err) {
+          <div class="message-details-dialog-error">
+            <p>
+              <span class="bi bi-exclamation-triangle"></span>
+              {{ err }}
+            </p>
+          </div>
+        }
+
         <table style="table-layout: fixed; width: 100%; max-width: 100%; overflow: hidden">
           @for (msg of messages(); track msg.id) {
-            @if (msg.areaHeading) {
+            @if (areaHeadings().get(msg.id); as heading) {
               <tr>
                 <td style="border: none">
                   <h4 class="message-area-heading">
-                    <app-message-area-name [area]="msg.areaHeading" [lineage]="false" />
+                    <app-message-area-name [area]="heading" [lineage]="false" />
                   </h4>
                 </td>
               </tr>
@@ -127,7 +132,6 @@ import { MessageVo } from '../../../../core/models/message.model';
   `,
 })
 export class MessagePrintViewComponent implements OnInit {
-  private readonly http = inject(HttpClient);
   private readonly destroyRef = inject(DestroyRef);
   private readonly route = inject(ActivatedRoute);
   private readonly transloco = inject(TranslocoService);
@@ -137,7 +141,9 @@ export class MessagePrintViewComponent implements OnInit {
   private readonly appConfig = inject(AppConfigService);
 
   readonly messages = signal<MessageVo[]>([]);
+  readonly areaHeadings = signal(new Map<string, AreaVo>());
   readonly bannerText = signal('');
+  readonly error = signal<string | undefined>(undefined);
 
   ngOnInit(): void {
     const requestedLang = this.route.snapshot.queryParamMap.get('language')
@@ -192,17 +198,19 @@ export class MessagePrintViewComponent implements OnInit {
             this.messages.set([sorted]);
           }
         },
+        error: () => this.error.set('Failed to load message'),
       });
       return;
     }
 
-    this.http.get<MessageVo[]>(`/api/rest/public/v1/messages?${query}`).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+    this.messageService.getMessages(query).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: messages => {
         const sorted = messages.map(m => this.messageService.sortDescs(m, lang));
         const filtered = this.messageService.filterByAreaIds(sorted, selectedSubAreaIds);
-        this.messageService.addAreaHeadings(filtered);
+        this.areaHeadings.set(this.messageService.computeAreaHeadings(filtered));
         this.messages.set(filtered);
       },
+      error: () => this.error.set('Failed to load messages'),
     });
   }
 }

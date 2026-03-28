@@ -176,28 +176,28 @@ describe('MessageService', () => {
     });
   });
 
-  // --- addAreaHeadings() ---
+  // --- computeAreaHeadings() ---
 
-  describe('addAreaHeadings()', () => {
-    it('should set heading on first message of group', () => {
+  describe('computeAreaHeadings()', () => {
+    it('should return heading for first message of group', () => {
       const area: AreaVo = { id: 'A' };
       const msgs: MessageVo[] = [
         { id: '1', mainType: 'NW', areas: [area] },
         { id: '2', mainType: 'NW', areas: [area] },
       ];
-      service.addAreaHeadings(msgs);
-      expect(msgs[0].areaHeading).toBeDefined();
-      expect(msgs[1].areaHeading).toBeUndefined();
+      const headings = service.computeAreaHeadings(msgs);
+      expect(headings.get('1')).toBeDefined();
+      expect(headings.has('2')).toBe(false);
     });
 
-    it('should set heading on subsequent different area', () => {
+    it('should return headings for subsequent different areas', () => {
       const msgs: MessageVo[] = [
         { id: '1', mainType: 'NW', areas: [{ id: 'A' }] },
         { id: '2', mainType: 'NW', areas: [{ id: 'B' }] },
       ];
-      service.addAreaHeadings(msgs);
-      expect(msgs[0].areaHeading).toBeDefined();
-      expect(msgs[1].areaHeading).toBeDefined();
+      const headings = service.computeAreaHeadings(msgs);
+      expect(headings.get('1')).toBeDefined();
+      expect(headings.get('2')).toBeDefined();
     });
 
     it('should respect maxLevels with nested areas', () => {
@@ -205,14 +205,20 @@ describe('MessageService', () => {
       const mid: AreaVo = { id: 'mid', parent: root };
       const leaf: AreaVo = { id: 'leaf', parent: mid };
       const msgs: MessageVo[] = [{ id: '1', mainType: 'NW', areas: [leaf] }];
-      service.addAreaHeadings(msgs, 2);
-      expect(msgs[0].areaHeading!.id).toBe('mid');
+      const headings = service.computeAreaHeadings(msgs, 2);
+      expect(headings.get('1')!.id).toBe('mid');
     });
 
     it('should skip messages with no areas', () => {
       const msgs: MessageVo[] = [{ id: '1', mainType: 'NW' }];
-      service.addAreaHeadings(msgs);
-      expect(msgs[0].areaHeading).toBeUndefined();
+      const headings = service.computeAreaHeadings(msgs);
+      expect(headings.has('1')).toBe(false);
+    });
+
+    it('should not mutate messages', () => {
+      const msgs: MessageVo[] = [{ id: '1', mainType: 'NW', areas: [{ id: 'A' }] }];
+      service.computeAreaHeadings(msgs);
+      expect((msgs[0] as Record<string, unknown>)['areaHeading']).toBeUndefined();
     });
   });
 
@@ -280,6 +286,17 @@ describe('MessageService', () => {
         parts: [{ type: 'DETAILS' }],
       };
       expect(service.featuresForMessage(msg)).toEqual([]);
+    });
+  });
+
+  // --- getMessages() ---
+
+  describe('getMessages()', () => {
+    it('should make GET with query string', () => {
+      service.getMessages('language=en&mainType=NW').subscribe();
+      const req = httpTesting.expectOne('/api/rest/public/v1/messages?language=en&mainType=NW');
+      expect(req.request.method).toBe('GET');
+      req.flush([]);
     });
   });
 

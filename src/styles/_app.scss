@@ -19,11 +19,11 @@ h2 { font-size: 22px; }
 h3 { font-size: 18px; }
 h4 { font-size: 14px; }
 
-// Print styles — replicate what Bootstrap 3 provided automatically
+// Print styles — scoped to layout pages so the dedicated print view can use its own styles
 @media print {
-  *,
-  *::before,
-  *::after {
+  app-layout *,
+  app-layout *::before,
+  app-layout *::after {
     color: #000 !important;
     text-shadow: none !important;
     background: transparent !important;
@@ -80,11 +80,7 @@ h4 { font-size: 14px; }
   }
 
   .no-print {
-    visibility: hidden;
-  }
-
-  .print {
-    visibility: visible;
+    display: none;
   }
 
   .view-mode-bar,

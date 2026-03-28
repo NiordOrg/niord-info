@@ -21,7 +21,6 @@ export interface AreaVo {
   zoomLevel?: number;
   // UI state
   selected?: boolean;
-  areaHeading?: AreaVo;
 }
 
 export interface ChartVo {
@@ -79,6 +78,4 @@ export interface MessageVo {
   descs?: DescVo[];
   publishDateFrom?: string | number;
   originalInformation?: boolean;
-  // UI state
-  areaHeading?: AreaVo;
 }

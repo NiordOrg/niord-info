@@ -16,6 +16,10 @@ export class MessageService {
     return this.http.get<MessageVo>(`/api/rest/public/v1/message/${encodeURIComponent(id)}?lang=${lang}`);
   }
 
+  getMessages(query: string): Observable<MessageVo[]> {
+    return this.http.get<MessageVo[]>(`/api/rest/public/v1/messages?${query}`);
+  }
+
   /** Returns the description record for the given language */
   desc(o: { descs?: DescVo[] } | undefined, lang?: string): DescVo | undefined {
     lang = lang || this.languageService.language();
@@ -77,8 +81,9 @@ export class MessageService {
     };
   }
 
-  /** Assigns `areaHeading` to the first message in each area group. */
-  addAreaHeadings(messages: MessageVo[], maxLevels = 2): void {
+  /** Returns a map from message id to its area heading for the first message in each area group. */
+  computeAreaHeadings(messages: MessageVo[], maxLevels = 2): Map<string, AreaVo> {
+    const headings = new Map<string, AreaVo>();
     let lastAreaId: string | undefined;
     for (const msg of messages) {
       if (msg.areas && msg.areas.length > 0) {
@@ -92,11 +97,12 @@ export class MessageService {
           const area = areas[Math.min(areas.length - 1, maxLevels - 1)];
           if (!lastAreaId || area.id !== lastAreaId) {
             lastAreaId = area.id;
-            msg.areaHeading = area;
+            headings.set(msg.id, area);
           }
         }
       }
     }
+    return headings;
   }
 
   /** Filters messages to those matching any selected area id in their area lineage. */
