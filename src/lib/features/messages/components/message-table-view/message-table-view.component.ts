@@ -15,11 +15,11 @@ import { MessagesComponent } from '../../messages.component';
     <div class="message-details-list">
       <table style="width: 100%">
         @for (msg of parent.messages(); track msg.id) {
-          @if (msg.areaHeading) {
+          @if (parent.areaHeadings().get(msg.id); as heading) {
             <tr>
               <td colspan="2" style="border: none">
                 <h4 class="message-area-heading">
-                  <app-message-area-name [area]="msg.areaHeading" [lineage]="false" />
+                  <app-message-area-name [area]="heading" [lineage]="false" />
                 </h4>
               </td>
             </tr>

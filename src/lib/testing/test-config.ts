@@ -56,6 +56,7 @@ export function provideTranslocoSpy(): Provider {
 export function createMockMessagesParent(overrides?: Record<string, unknown>) {
   return {
     messages: signal([]),
+    areaHeadings: signal(new Map()),
     rootArea: signal(undefined),
     subAreas: signal([]),
     mainTypes: signal({ NW: true, NM: true }),
