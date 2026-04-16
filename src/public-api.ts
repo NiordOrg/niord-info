@@ -2,6 +2,8 @@
 export type { NiordInfoConfig, RootAreaSpec } from './lib/niord-info.config';
 export { NIORD_INFO_CONFIG } from './lib/niord-info.config';
 export { provideNiordInfo } from './lib/provide-niord-info';
+export type { NiordInfoRuntimeConfig } from './lib/runtime-config';
+export { loadNiordInfoRuntimeConfig, parseNiordInfoRuntimeConfig } from './lib/runtime-config';
 
 // Models
 export type {
